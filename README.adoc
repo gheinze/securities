@@ -1,0 +1,522 @@
+== Stock Querying Utilities
+
+Some utilities to pull/scrape stock quotes from REST endpoints. The command line interfaces are provided as an example of library isage.
+
+=== stock-quote
+A command line utility for querying a stock service. Includes a service implementation (`quote-yahoo`) as an example.
+Wraps utilities in executable script.
+
+=== quote-api
+An interface specification used by `quote-service`. Implementations are discovered by the `ServiceLoader` mechanism. To add
+quote services, implement this api and add to classpath.
+
+=== quote-yahoo
+An implementation of the `quote-api` which queries the Yahoo quote service.
+
+=== option-scraper-tmx
+An example of scraping Options data from TMX web pages.
+
+== Building
+
+Build all submodules from the root `securities` directory with maven:
+
+[source,bash]
+----
+mvn package
+----
+
+The build output should look like this:
+
+----
+[INFO] Reactor Summary:
+[INFO]
+[INFO] securities ......................................... SUCCESS [  0.113 s]
+[INFO] quote-api .......................................... SUCCESS [  1.232 s]
+[INFO] quote-yahoo ........................................ SUCCESS [  0.823 s]
+[INFO] quote-service ...................................... SUCCESS [  2.151 s]
+[INFO] option-scraper-tmx ................................. SUCCESS [  0.360 s]
+----
+
+== Executables
+
+The build will result in two executables (versioned):
+
+* ./quote-service/target/quote-service-1.0.0-SNAPSHOT-dist.zip
+* ./option-scraper-tmx/target/option-scraper-tmx-1.0.0-SNAPSHOT-dist.zip
+
+Unpack the zip file, cd into the `bin` subdirectory, launch `stockquote.sh`:
+
+----
+$ unzip quote-service-1.0.0-SNAPSHOT-dist.zip
+$ cd quote-service-1.0.0-SNAPSHOT/bin/
+$ ls
+quote-service-1.0.0-SNAPSHOT.jar  stockquote.bat  stockquote.sh
+----
+
+== `stokquote.sh` Usage Examples
+
+.Show help:
+[source,bash]
+----
+stock-quote-1.0-SNAPSHOT/bin$ ./stockquote.sh -help
+
+usage:
+  1. stockquote.sh -service Yahoo -symbols ORCL,SLF.TO -attributes lastTradePrice,dividendPerShare
+  2. stockquote.sh -showServices
+  4. stockquote.sh -showAttributes
+
+ -attributes <queryAttributes>   comma separated list of attributes to
+                                 query for (example:
+                                 lastTradePrice,dividendPerShare)
+ -help                           print this message
+ -service <serviceName>          use the named service for obtaining
+                                 quote.
+ -showAttributes                 list attributes that may be retrieved
+ -showServices                   list the stock quoting services available
+                                 for queries
+ -symbols <tickerSymbols>        comma separated list of ticker symbols to
+                                 query for (example: ORCL,BMO.TO
+ -version                        print the version information and exit
+
+----
+
+.Discover available services:
+[source,bash]
+----
+stock-quote-1.0-SNAPSHOT/bin$ ./stockquote.sh -showServices
+
+Discovered services:
+  Yahoo
+----
+
+.Show attributes available for query:
+[source,bash]
+----
+stock-quote-1.0-SNAPSHOT/bin$ ./stockquote.sh -showAttributes
+
+Supported query attributes:
+  symbol
+  companyName
+  lastTradePrice
+  bookValue
+  earningsPerShare
+  dividendPerShare
+  exDividendDate
+  dividendDate
+  dividendYield
+----
+
+
+.Query example:
+[source,bash]
+----
+stock-quote-1.0-SNAPSHOT/bin$ ./stockquote.sh -service Yahoo -symbols BMO.TO,SLF.TO -attributes lastTradePrice,dividendPerShare,companyName
+
+Query url: http://finance.yahoo.com/d/quotes.csv?s=BMO.TO+SLF.TO&f=l1dn
+
+symbol="BMO.TO", companyName="BANK OF MONTREAL", lastTradePrice="97.38", dividendPerShare="3.52"
+symbol="SLF.TO", companyName="SUN LIFE FINANCIAL INC.", lastTradePrice="46.69", dividendPerShare="1.68"
+----
+
+== `stokquote.sh` Usage Example
+
+----
+$ option-scraper-tmx-1.0.0-SNAPSHOT/bin$ ./options.sh BMO
+Query url: http://www.m-x.ca/nego_cotes_en.php?pageTopPrint=yes&symbol=BMO
+
+Symbol: BMO
+Last Price: 97.38
+Bid Price: 97.35
+Ask Price: 97.39
+Query Time: April 15, 2017 at 5:15 p.m.
+
+CALL
+  CALL BMO 2017-04-21 68.00 bid: 29.35 ask: 29.50 last: 29.50
+  CALL BMO 2017-04-21 70.00 bid: 27.35 ask: 27.50 last: 27.50
+  CALL BMO 2017-04-21 72.00 bid: 25.35 ask: 25.45 last: 25.45
+  CALL BMO 2017-04-21 74.00 bid: 23.35 ask: 23.45 last: 23.45
+  CALL BMO 2017-04-21 75.00 bid: 22.35 ask: 22.45 last: 22.45
+  CALL BMO 2017-04-21 76.00 bid: 21.35 ask: 21.50 last: 21.50
+  CALL BMO 2017-04-21 78.00 bid: 19.35 ask: 19.50 last: 19.50
+  CALL BMO 2017-04-21 80.00 bid: 17.35 ask: 17.50 last: 17.50
+  CALL BMO 2017-04-21 82.00 bid: 15.35 ask: 15.50 last: 15.50
+  CALL BMO 2017-04-21 84.00 bid: 13.35 ask: 13.50 last: 13.00
+  CALL BMO 2017-04-21 86.00 bid: 11.35 ask: 11.50 last: 11.50
+  CALL BMO 2017-04-21 88.00 bid: 9.35 ask: 9.50 last: 9.50
+  CALL BMO 2017-04-21 90.00 bid: 7.40 ask: 7.50 last: 7.50
+  CALL BMO 2017-04-21 92.00 bid: 5.40 ask: 5.50 last: 5.50
+  CALL BMO 2017-04-21 94.00 bid: 3.40 ask: 3.55 last: 3.55
+  CALL BMO 2017-04-21 96.00 bid: 1.60 ask: 1.71 last: 1.71
+  CALL BMO 2017-04-21 98.00 bid: 0.38 ask: 0.43 last: 0.43
+  CALL BMO 2017-04-21 99.00 bid: 0.11 ask: 0.17 last: 0.17
+  CALL BMO 2017-04-21 100.00 bid: 0.01 ask: 0.11 last: 0.11
+  CALL BMO 2017-04-21 101.00 bid: 0.00 ask: 0.11 last: 0.11
+  CALL BMO 2017-04-21 105.00 bid: 0.02 ask: 0.10 last: 0.10
+  CALL BMO 2017-04-21 110.00 bid: 0.00 ask: 0.09 last: 0.09
+  CALL BMO 2017-04-21 115.00 bid: 0.00 ask: 0.11 last: 0.11
+  CALL BMO 2017-04-21 120.00 bid: 0.00 ask: 0.11 last: 0.11
+  CALL BMO 2017-04-21 125.00 bid: 0.00 ask: 0.10 last: 0.10
+  CALL BMO 2017-04-28 96.50 bid: 1.40 ask: 1.47 last: 1.47
+  CALL BMO 2017-04-28 97.00 bid: 1.03 ask: 1.14 last: 1.14
+  CALL BMO 2017-04-28 97.50 bid: 0.75 ask: 0.86 last: 0.86
+  CALL BMO 2017-04-28 98.00 bid: 0.53 ask: 0.62 last: 0.62
+  CALL BMO 2017-04-28 98.50 bid: 0.38 ask: 0.44 last: 0.44
+  CALL BMO 2017-04-28 99.00 bid: 0.24 ask: 0.30 last: 0.30
+  CALL BMO 2017-04-28 99.50 bid: 0.14 ask: 0.20 last: 0.20
+  CALL BMO 2017-04-28 100.00 bid: 0.08 ask: 0.17 last: 0.17
+  CALL BMO 2017-04-28 100.50 bid: 0.03 ask: 0.17 last: 0.17
+  CALL BMO 2017-04-28 101.00 bid: 0.01 ask: 0.17 last: 0.17
+  CALL BMO 2017-04-28 101.50 bid: 0.00 ask: 0.17 last: 0.17
+  CALL BMO 2017-04-28 102.00 bid: 0.00 ask: 0.16 last: 0.16
+  CALL BMO 2017-04-28 102.50 bid: 0.00 ask: 0.16 last: 0.16
+  CALL BMO 2017-05-05 96.50 bid: 1.53 ask: 1.66 last: 1.66
+  CALL BMO 2017-05-05 97.00 bid: 1.21 ask: 1.28 last: 1.28
+  CALL BMO 2017-05-05 97.50 bid: 0.94 ask: 1.02 last: 1.02
+  CALL BMO 2017-05-05 98.00 bid: 0.70 ask: 0.79 last: 0.79
+  CALL BMO 2017-05-05 98.50 bid: 0.52 ask: 0.57 last: 0.57
+  CALL BMO 2017-05-05 99.00 bid: 0.36 ask: 0.42 last: 0.42
+  CALL BMO 2017-05-05 99.50 bid: 0.25 ask: 0.31 last: 0.31
+  CALL BMO 2017-05-05 100.00 bid: 0.16 ask: 0.22 last: 0.22
+  CALL BMO 2017-05-05 100.50 bid: 0.10 ask: 0.17 last: 0.17
+  CALL BMO 2017-05-05 101.00 bid: 0.06 ask: 0.17 last: 0.17
+  CALL BMO 2017-05-05 101.50 bid: 0.03 ask: 0.17 last: 0.17
+  CALL BMO 2017-05-05 102.00 bid: 0.01 ask: 0.17 last: 0.17
+  CALL BMO 2017-05-05 102.50 bid: 0.00 ask: 0.17 last: 0.17
+  CALL BMO 2017-05-12 96.50 bid: 1.67 ask: 1.74 last: 1.74
+  CALL BMO 2017-05-12 97.00 bid: 1.38 ask: 1.44 last: 1.44
+  CALL BMO 2017-05-12 97.50 bid: 1.11 ask: 1.16 last: 1.16
+  CALL BMO 2017-05-12 98.00 bid: 0.88 ask: 0.93 last: 0.93
+  CALL BMO 2017-05-12 98.50 bid: 0.68 ask: 0.73 last: 0.73
+  CALL BMO 2017-05-12 99.00 bid: 0.51 ask: 0.57 last: 0.57
+  CALL BMO 2017-05-12 99.50 bid: 0.38 ask: 0.44 last: 0.44
+  CALL BMO 2017-05-12 100.00 bid: 0.28 ask: 0.34 last: 0.34
+  CALL BMO 2017-05-12 100.50 bid: 0.21 ask: 0.26 last: 0.26
+  CALL BMO 2017-05-19 78.00 bid: 19.35 ask: 19.50 last: 19.50
+  CALL BMO 2017-05-19 80.00 bid: 17.35 ask: 17.50 last: 17.50
+  CALL BMO 2017-05-19 82.00 bid: 15.35 ask: 15.50 last: 15.50
+  CALL BMO 2017-05-19 84.00 bid: 13.35 ask: 13.50 last: 13.50
+  CALL BMO 2017-05-19 86.00 bid: 11.35 ask: 11.50 last: 11.50
+  CALL BMO 2017-05-19 88.00 bid: 9.35 ask: 9.50 last: 9.50
+  CALL BMO 2017-05-19 90.00 bid: 7.40 ask: 7.50 last: 7.50
+  CALL BMO 2017-05-19 92.00 bid: 5.45 ask: 5.60 last: 5.60
+  CALL BMO 2017-05-19 94.00 bid: 3.65 ask: 3.80 last: 3.80
+  CALL BMO 2017-05-19 96.00 bid: 2.14 ask: 2.21 last: 2.21
+  CALL BMO 2017-05-19 98.00 bid: 1.04 ask: 1.10 last: 1.10
+  CALL BMO 2017-05-19 100.00 bid: 0.41 ask: 0.47 last: 0.47
+  CALL BMO 2017-05-19 101.00 bid: 0.00 ask: 0.00 last: 0.33
+  CALL BMO 2017-05-19 102.00 bid: 0.13 ask: 0.19 last: 0.19
+  CALL BMO 2017-05-19 105.00 bid: 0.00 ask: 0.16 last: 0.16
+  CALL BMO 2017-05-19 110.00 bid: 0.00 ask: 0.16 last: 0.16
+  CALL BMO 2017-05-19 115.00 bid: 0.00 ask: 0.16 last: 0.16
+  CALL BMO 2017-05-19 120.00 bid: 0.00 ask: 0.17 last: 0.17
+  CALL BMO 2017-05-19 125.00 bid: 0.00 ask: 0.17 last: 0.17
+  CALL BMO 2017-05-19 130.00 bid: 0.00 ask: 0.16 last: 0.16
+  CALL BMO 2017-07-21 70.00 bid: 27.20 ask: 27.70 last: 27.70
+  CALL BMO 2017-07-21 72.00 bid: 25.20 ask: 25.70 last: 25.70
+  CALL BMO 2017-07-21 74.00 bid: 23.10 ask: 23.70 last: 23.70
+  CALL BMO 2017-07-21 76.00 bid: 21.25 ask: 21.70 last: 21.70
+  CALL BMO 2017-07-21 78.00 bid: 19.15 ask: 19.70 last: 19.70
+  CALL BMO 2017-07-21 80.00 bid: 17.20 ask: 17.70 last: 17.70
+  CALL BMO 2017-07-21 82.00 bid: 15.25 ask: 15.75 last: 15.75
+  CALL BMO 2017-07-21 84.00 bid: 13.25 ask: 13.75 last: 13.75
+  CALL BMO 2017-07-21 86.00 bid: 11.25 ask: 11.80 last: 11.80
+  CALL BMO 2017-07-21 88.00 bid: 9.30 ask: 9.90 last: 9.90
+  CALL BMO 2017-07-21 90.00 bid: 7.50 ask: 8.00 last: 8.00
+  CALL BMO 2017-07-21 92.00 bid: 5.90 ask: 6.40 last: 6.40
+  CALL BMO 2017-07-21 94.00 bid: 4.40 ask: 4.90 last: 4.90
+  CALL BMO 2017-07-21 96.00 bid: 3.10 ask: 3.65 last: 3.65
+  CALL BMO 2017-07-21 98.00 bid: 2.06 ask: 2.52 last: 2.52
+  CALL BMO 2017-07-21 100.00 bid: 1.28 ask: 1.55 last: 1.55
+  CALL BMO 2017-07-21 105.00 bid: 0.15 ask: 0.36 last: 0.36
+  CALL BMO 2017-07-21 110.00 bid: 0.00 ask: 0.10 last: 0.10
+  CALL BMO 2017-07-21 115.00 bid: 0.00 ask: 0.39 last: 0.39
+  CALL BMO 2017-07-21 120.00 bid: 0.00 ask: 0.39 last: 0.39
+  CALL BMO 2017-07-21 125.00 bid: 0.00 ask: 0.39 last: 0.39
+  CALL BMO 2017-10-20 78.00 bid: 19.05 ask: 19.85 last: 19.85
+  CALL BMO 2017-10-20 80.00 bid: 17.15 ask: 17.90 last: 17.90
+  CALL BMO 2017-10-20 82.00 bid: 15.10 ask: 15.95 last: 15.95
+  CALL BMO 2017-10-20 84.00 bid: 13.25 ask: 14.05 last: 14.05
+  CALL BMO 2017-10-20 86.00 bid: 11.35 ask: 12.10 last: 12.10
+  CALL BMO 2017-10-20 88.00 bid: 9.60 ask: 10.30 last: 10.30
+  CALL BMO 2017-10-20 90.00 bid: 7.95 ask: 8.80 last: 8.80
+  CALL BMO 2017-10-20 92.00 bid: 6.40 ask: 7.40 last: 7.40
+  CALL BMO 2017-10-20 94.00 bid: 5.15 ask: 5.95 last: 5.95
+  CALL BMO 2017-10-20 96.00 bid: 4.00 ask: 4.80 last: 4.80
+  CALL BMO 2017-10-20 98.00 bid: 2.92 ask: 3.75 last: 3.75
+  CALL BMO 2017-10-20 100.00 bid: 2.11 ask: 2.84 last: 2.84
+  CALL BMO 2017-10-20 105.00 bid: 0.59 ask: 1.45 last: 1.45
+  CALL BMO 2017-10-20 110.00 bid: 0.11 ask: 0.45 last: 0.45
+  CALL BMO 2017-10-20 115.00 bid: 0.01 ask: 0.60 last: 0.60
+  CALL BMO 2017-10-20 120.00 bid: 0.00 ask: 0.55 last: 0.55
+  CALL BMO 2017-10-20 125.00 bid: 0.00 ask: 0.53 last: 0.53
+  CALL BMO 2018-01-19 38.00 bid: 59.05 ask: 59.95 last: 59.95
+  CALL BMO 2018-01-19 40.00 bid: 57.05 ask: 57.95 last: 57.95
+  CALL BMO 2018-01-19 42.00 bid: 55.05 ask: 55.95 last: 55.95
+  CALL BMO 2018-01-19 44.00 bid: 53.05 ask: 54.05 last: 54.05
+  CALL BMO 2018-01-19 46.00 bid: 51.05 ask: 52.05 last: 52.05
+  CALL BMO 2018-01-19 48.00 bid: 49.05 ask: 50.05 last: 50.05
+  CALL BMO 2018-01-19 50.00 bid: 47.05 ask: 48.05 last: 48.05
+  CALL BMO 2018-01-19 52.00 bid: 45.05 ask: 46.05 last: 46.05
+  CALL BMO 2018-01-19 54.00 bid: 42.95 ask: 43.95 last: 43.95
+  CALL BMO 2018-01-19 56.00 bid: 41.00 ask: 41.95 last: 41.95
+  CALL BMO 2018-01-19 58.00 bid: 39.00 ask: 39.95 last: 39.95
+  CALL BMO 2018-01-19 60.00 bid: 37.05 ask: 38.05 last: 38.05
+  CALL BMO 2018-01-19 62.00 bid: 35.00 ask: 36.00 last: 36.00
+  CALL BMO 2018-01-19 64.00 bid: 33.05 ask: 34.05 last: 34.05
+  CALL BMO 2018-01-19 66.00 bid: 31.10 ask: 32.05 last: 32.05
+  CALL BMO 2018-01-19 68.00 bid: 29.05 ask: 30.05 last: 30.05
+  CALL BMO 2018-01-19 70.00 bid: 27.05 ask: 28.05 last: 28.05
+  CALL BMO 2018-01-19 72.00 bid: 25.05 ask: 26.00 last: 26.00
+  CALL BMO 2018-01-19 74.00 bid: 23.05 ask: 24.00 last: 24.00
+  CALL BMO 2018-01-19 76.00 bid: 21.00 ask: 21.55 last: 21.55
+  CALL BMO 2018-01-19 78.00 bid: 19.10 ask: 19.95 last: 19.95
+  CALL BMO 2018-01-19 80.00 bid: 17.15 ask: 18.05 last: 18.05
+  CALL BMO 2018-01-19 82.00 bid: 15.20 ask: 16.15 last: 16.15
+  CALL BMO 2018-01-19 84.00 bid: 13.25 ask: 13.80 last: 13.80
+  CALL BMO 2018-01-19 86.00 bid: 11.65 ask: 12.65 last: 12.65
+  CALL BMO 2018-01-19 88.00 bid: 9.95 ask: 11.10 last: 11.10
+  CALL BMO 2018-01-19 90.00 bid: 8.25 ask: 9.50 last: 9.50
+  CALL BMO 2018-01-19 92.00 bid: 6.80 ask: 7.55 last: 7.55
+  CALL BMO 2018-01-19 94.00 bid: 5.80 ask: 6.75 last: 6.75
+  CALL BMO 2018-01-19 96.00 bid: 4.60 ask: 5.65 last: 5.65
+  CALL BMO 2018-01-19 98.00 bid: 3.60 ask: 4.60 last: 4.60
+  CALL BMO 2018-01-19 100.00 bid: 2.74 ask: 3.85 last: 3.85
+  CALL BMO 2018-01-19 105.00 bid: 1.11 ask: 2.17 last: 2.17
+  CALL BMO 2018-01-19 110.00 bid: 0.20 ask: 0.96 last: 0.96
+  CALL BMO 2018-01-19 115.00 bid: 0.02 ask: 0.75 last: 0.75
+  CALL BMO 2018-01-19 120.00 bid: 0.00 ask: 0.63 last: 0.63
+  CALL BMO 2018-01-19 125.00 bid: 0.00 ask: 0.55 last: 0.55
+  CALL BMO 2018-01-19 130.00 bid: 0.00 ask: 0.53 last: 0.53
+  CALL BMO 2019-01-18 40.00 bid: 56.70 ask: 58.70 last: 58.70
+  CALL BMO 2019-01-18 42.00 bid: 54.70 ask: 56.70 last: 56.70
+  CALL BMO 2019-01-18 44.00 bid: 52.70 ask: 54.70 last: 54.70
+  CALL BMO 2019-01-18 46.00 bid: 50.70 ask: 52.70 last: 52.70
+  CALL BMO 2019-01-18 48.00 bid: 48.70 ask: 50.70 last: 50.70
+  CALL BMO 2019-01-18 50.00 bid: 47.05 ask: 48.85 last: 48.85
+  CALL BMO 2019-01-18 52.00 bid: 45.05 ask: 46.85 last: 46.85
+  CALL BMO 2019-01-18 54.00 bid: 43.05 ask: 44.70 last: 44.70
+  CALL BMO 2019-01-18 56.00 bid: 40.70 ask: 42.70 last: 42.70
+  CALL BMO 2019-01-18 58.00 bid: 38.70 ask: 40.70 last: 40.70
+  CALL BMO 2019-01-18 60.00 bid: 36.70 ask: 38.70 last: 38.70
+  CALL BMO 2019-01-18 62.00 bid: 34.70 ask: 36.70 last: 36.70
+  CALL BMO 2019-01-18 64.00 bid: 32.80 ask: 34.75 last: 34.75
+  CALL BMO 2019-01-18 66.00 bid: 30.70 ask: 32.70 last: 32.70
+  CALL BMO 2019-01-18 68.00 bid: 28.70 ask: 30.70 last: 30.70
+  CALL BMO 2019-01-18 70.00 bid: 26.70 ask: 28.70 last: 28.70
+  CALL BMO 2019-01-18 72.00 bid: 24.70 ask: 26.70 last: 26.70
+  CALL BMO 2019-01-18 74.00 bid: 22.70 ask: 24.70 last: 24.70
+  CALL BMO 2019-01-18 76.00 bid: 20.70 ask: 22.70 last: 22.70
+  CALL BMO 2019-01-18 78.00 bid: 18.80 ask: 20.70 last: 20.70
+  CALL BMO 2019-01-18 80.00 bid: 16.85 ask: 19.00 last: 19.00
+  CALL BMO 2019-01-18 82.00 bid: 15.15 ask: 17.35 last: 17.35
+  CALL BMO 2019-01-18 84.00 bid: 13.45 ask: 15.65 last: 15.65
+  CALL BMO 2019-01-18 86.00 bid: 12.35 ask: 14.15 last: 14.15
+  CALL BMO 2019-01-18 88.00 bid: 10.45 ask: 12.70 last: 12.70
+  CALL BMO 2019-01-18 90.00 bid: 9.05 ask: 11.60 last: 11.60
+  CALL BMO 2019-01-18 92.00 bid: 7.80 ask: 10.10 last: 10.10
+  CALL BMO 2019-01-18 94.00 bid: 6.50 ask: 9.20 last: 9.20
+  CALL BMO 2019-01-18 96.00 bid: 5.20 ask: 8.20 last: 8.20
+  CALL BMO 2019-01-18 98.00 bid: 4.45 ask: 7.20 last: 7.20
+  CALL BMO 2019-01-18 100.00 bid: 4.40 ask: 6.30 last: 6.30
+  CALL BMO 2019-01-18 105.00 bid: 1.76 ask: 4.55 last: 4.55
+  CALL BMO 2019-01-18 110.00 bid: 0.53 ask: 3.15 last: 3.15
+  CALL BMO 2019-01-18 115.00 bid: 0.12 ask: 2.30 last: 2.30
+  CALL BMO 2019-01-18 120.00 bid: 0.00 ask: 2.81 last: 2.81
+  CALL BMO 2019-01-18 125.00 bid: 0.00 ask: 2.50 last: 2.50
+  CALL BMO 2019-01-18 130.00 bid: 0.00 ask: 2.34 last: 2.34
+
+PUT
+  PUT BMO 2017-04-21 68.00 bid: 0.01 ask: 0.05 last: 0.05
+  PUT BMO 2017-04-21 70.00 bid: 0.00 ask: 0.10 last: 0.10
+  PUT BMO 2017-04-21 72.00 bid: 0.00 ask: 0.10 last: 0.10
+  PUT BMO 2017-04-21 74.00 bid: 0.00 ask: 0.10 last: 0.10
+  PUT BMO 2017-04-21 75.00 bid: 0.00 ask: 0.09 last: 0.09
+  PUT BMO 2017-04-21 76.00 bid: 0.00 ask: 0.09 last: 0.09
+  PUT BMO 2017-04-21 78.00 bid: 0.00 ask: 0.09 last: 0.09
+  PUT BMO 2017-04-21 80.00 bid: 0.00 ask: 0.09 last: 0.09
+  PUT BMO 2017-04-21 82.00 bid: 0.00 ask: 0.11 last: 0.11
+  PUT BMO 2017-04-21 84.00 bid: 0.00 ask: 0.11 last: 0.11
+  PUT BMO 2017-04-21 86.00 bid: 0.00 ask: 0.11 last: 0.11
+  PUT BMO 2017-04-21 88.00 bid: 0.00 ask: 0.11 last: 0.11
+  PUT BMO 2017-04-21 90.00 bid: 0.00 ask: 0.11 last: 0.11
+  PUT BMO 2017-04-21 92.00 bid: 0.02 ask: 0.08 last: 0.08
+  PUT BMO 2017-04-21 94.00 bid: 0.06 ask: 0.13 last: 0.13
+  PUT BMO 2017-04-21 96.00 bid: 0.24 ask: 0.29 last: 0.29
+  PUT BMO 2017-04-21 98.00 bid: 0.94 ask: 1.03 last: 1.03
+  PUT BMO 2017-04-21 99.00 bid: 1.69 ask: 1.76 last: 1.76
+  PUT BMO 2017-04-21 100.00 bid: 2.57 ask: 2.70 last: 2.70
+  PUT BMO 2017-04-21 101.00 bid: 3.55 ask: 3.65 last: 3.65
+  PUT BMO 2017-04-21 105.00 bid: 7.55 ask: 7.65 last: 7.65
+  PUT BMO 2017-04-21 110.00 bid: 12.55 ask: 12.65 last: 12.65
+  PUT BMO 2017-04-21 115.00 bid: 17.55 ask: 17.65 last: 17.65
+  PUT BMO 2017-04-21 120.00 bid: 22.55 ask: 22.65 last: 22.65
+  PUT BMO 2017-04-21 125.00 bid: 27.55 ask: 27.65 last: 27.65
+  PUT BMO 2017-04-28 96.50 bid: 0.94 ask: 1.00 last: 1.00
+  PUT BMO 2017-04-28 97.00 bid: 1.16 ask: 1.25 last: 1.25
+  PUT BMO 2017-04-28 97.50 bid: 1.47 ask: 1.54 last: 1.54
+  PUT BMO 2017-04-28 98.00 bid: 1.80 ask: 1.88 last: 1.88
+  PUT BMO 2017-04-28 98.50 bid: 2.18 ask: 2.32 last: 2.32
+  PUT BMO 2017-04-28 99.00 bid: 2.55 ask: 2.68 last: 2.68
+  PUT BMO 2017-04-28 99.50 bid: 3.00 ask: 3.10 last: 3.10
+  PUT BMO 2017-04-28 100.00 bid: 3.45 ask: 3.60 last: 3.60
+  PUT BMO 2017-04-28 100.50 bid: 3.95 ask: 4.05 last: 4.05
+  PUT BMO 2017-04-28 101.00 bid: 4.40 ask: 4.55 last: 4.55
+  PUT BMO 2017-04-28 101.50 bid: 4.90 ask: 5.05 last: 5.05
+  PUT BMO 2017-04-28 102.00 bid: 5.40 ask: 5.55 last: 5.55
+  PUT BMO 2017-04-28 102.50 bid: 5.90 ask: 6.05 last: 6.05
+  PUT BMO 2017-05-05 96.50 bid: 1.22 ask: 1.28 last: 1.28
+  PUT BMO 2017-05-05 97.00 bid: 1.45 ask: 1.52 last: 1.52
+  PUT BMO 2017-05-05 97.50 bid: 1.72 ask: 1.88 last: 1.88
+  PUT BMO 2017-05-05 98.00 bid: 2.03 ask: 2.19 last: 2.19
+  PUT BMO 2017-05-05 98.50 bid: 2.38 ask: 2.45 last: 2.45
+  PUT BMO 2017-05-05 99.00 bid: 2.75 ask: 2.91 last: 2.91
+  PUT BMO 2017-05-05 99.50 bid: 3.15 ask: 3.25 last: 3.25
+  PUT BMO 2017-05-05 100.00 bid: 3.55 ask: 3.70 last: 3.70
+  PUT BMO 2017-05-05 100.50 bid: 4.00 ask: 4.15 last: 4.15
+  PUT BMO 2017-05-05 101.00 bid: 4.50 ask: 4.60 last: 4.60
+  PUT BMO 2017-05-05 101.50 bid: 4.95 ask: 5.05 last: 5.05
+  PUT BMO 2017-05-05 102.00 bid: 5.45 ask: 5.55 last: 5.55
+  PUT BMO 2017-05-05 102.50 bid: 5.90 ask: 6.05 last: 6.05
+  PUT BMO 2017-05-12 96.50 bid: 1.45 ask: 1.52 last: 1.52
+  PUT BMO 2017-05-12 97.00 bid: 1.69 ask: 1.76 last: 1.76
+  PUT BMO 2017-05-12 97.50 bid: 1.96 ask: 2.03 last: 2.03
+  PUT BMO 2017-05-12 98.00 bid: 2.25 ask: 2.36 last: 2.36
+  PUT BMO 2017-05-12 98.50 bid: 2.56 ask: 2.65 last: 2.65
+  PUT BMO 2017-05-12 99.00 bid: 2.93 ask: 3.00 last: 3.00
+  PUT BMO 2017-05-12 99.50 bid: 3.30 ask: 3.40 last: 3.40
+  PUT BMO 2017-05-12 100.00 bid: 3.70 ask: 3.80 last: 3.80
+  PUT BMO 2017-05-12 100.50 bid: 4.10 ask: 4.25 last: 4.25
+  PUT BMO 2017-05-19 78.00 bid: 0.03 ask: 0.16 last: 0.16
+  PUT BMO 2017-05-19 80.00 bid: 0.04 ask: 0.16 last: 0.16
+  PUT BMO 2017-05-19 82.00 bid: 0.06 ask: 0.16 last: 0.16
+  PUT BMO 2017-05-19 84.00 bid: 0.09 ask: 0.17 last: 0.17
+  PUT BMO 2017-05-19 86.00 bid: 0.15 ask: 0.18 last: 0.18
+  PUT BMO 2017-05-19 88.00 bid: 0.19 ask: 0.24 last: 0.24
+  PUT BMO 2017-05-19 90.00 bid: 0.28 ask: 0.34 last: 0.34
+  PUT BMO 2017-05-19 92.00 bid: 0.47 ask: 0.57 last: 0.57
+  PUT BMO 2017-05-19 94.00 bid: 0.81 ask: 0.89 last: 0.89
+  PUT BMO 2017-05-19 96.00 bid: 1.44 ask: 1.50 last: 1.50
+  PUT BMO 2017-05-19 98.00 bid: 2.43 ask: 2.50 last: 2.50
+  PUT BMO 2017-05-19 100.00 bid: 3.80 ask: 3.95 last: 3.95
+  PUT BMO 2017-05-19 101.00 bid: 0.00 ask: 0.00 last: 0.00
+  PUT BMO 2017-05-19 102.00 bid: 5.55 ask: 5.65 last: 5.65
+  PUT BMO 2017-05-19 105.00 bid: 8.40 ask: 8.55 last: 8.55
+  PUT BMO 2017-05-19 110.00 bid: 13.40 ask: 13.55 last: 13.55
+  PUT BMO 2017-05-19 115.00 bid: 18.40 ask: 18.55 last: 18.55
+  PUT BMO 2017-05-19 120.00 bid: 23.40 ask: 23.55 last: 23.55
+  PUT BMO 2017-05-19 125.00 bid: 28.40 ask: 28.55 last: 28.55
+  PUT BMO 2017-05-19 130.00 bid: 33.40 ask: 33.55 last: 33.55
+  PUT BMO 2017-07-21 70.00 bid: 0.01 ask: 0.44 last: 0.44
+  PUT BMO 2017-07-21 72.00 bid: 0.01 ask: 0.45 last: 0.45
+  PUT BMO 2017-07-21 74.00 bid: 0.01 ask: 0.46 last: 0.46
+  PUT BMO 2017-07-21 76.00 bid: 0.01 ask: 0.49 last: 0.49
+  PUT BMO 2017-07-21 78.00 bid: 0.03 ask: 0.53 last: 0.53
+  PUT BMO 2017-07-21 80.00 bid: 0.08 ask: 0.57 last: 0.57
+  PUT BMO 2017-07-21 82.00 bid: 0.14 ask: 0.63 last: 0.63
+  PUT BMO 2017-07-21 84.00 bid: 0.25 ask: 0.54 last: 0.54
+  PUT BMO 2017-07-21 86.00 bid: 0.37 ask: 0.66 last: 0.66
+  PUT BMO 2017-07-21 88.00 bid: 0.56 ask: 0.90 last: 0.90
+  PUT BMO 2017-07-21 90.00 bid: 0.83 ask: 1.10 last: 1.10
+  PUT BMO 2017-07-21 92.00 bid: 1.19 ask: 1.39 last: 1.39
+  PUT BMO 2017-07-21 94.00 bid: 1.74 ask: 2.18 last: 2.18
+  PUT BMO 2017-07-21 96.00 bid: 2.26 ask: 2.96 last: 2.96
+  PUT BMO 2017-07-21 98.00 bid: 3.15 ask: 3.70 last: 3.70
+  PUT BMO 2017-07-21 100.00 bid: 4.35 ask: 4.95 last: 4.95
+  PUT BMO 2017-07-21 105.00 bid: 8.30 ask: 8.85 last: 8.85
+  PUT BMO 2017-07-21 110.00 bid: 13.15 ask: 13.60 last: 13.60
+  PUT BMO 2017-07-21 115.00 bid: 18.15 ask: 18.65 last: 18.65
+  PUT BMO 2017-07-21 120.00 bid: 23.10 ask: 23.65 last: 23.65
+  PUT BMO 2017-07-21 125.00 bid: 28.15 ask: 28.65 last: 28.65
+  PUT BMO 2017-10-20 78.00 bid: 0.28 ask: 1.16 last: 1.16
+  PUT BMO 2017-10-20 80.00 bid: 0.41 ask: 0.60 last: 0.60
+  PUT BMO 2017-10-20 82.00 bid: 0.56 ask: 0.80 last: 0.80
+  PUT BMO 2017-10-20 84.00 bid: 0.76 ask: 1.35 last: 1.35
+  PUT BMO 2017-10-20 86.00 bid: 1.02 ask: 1.69 last: 1.69
+  PUT BMO 2017-10-20 88.00 bid: 1.36 ask: 2.10 last: 2.10
+  PUT BMO 2017-10-20 90.00 bid: 1.78 ask: 2.10 last: 2.10
+  PUT BMO 2017-10-20 92.00 bid: 2.18 ask: 2.92 last: 2.92
+  PUT BMO 2017-10-20 94.00 bid: 2.94 ask: 3.55 last: 3.55
+  PUT BMO 2017-10-20 96.00 bid: 3.60 ask: 4.45 last: 4.45
+  PUT BMO 2017-10-20 98.00 bid: 4.50 ask: 5.25 last: 5.25
+  PUT BMO 2017-10-20 100.00 bid: 5.60 ask: 6.40 last: 6.40
+  PUT BMO 2017-10-20 105.00 bid: 9.25 ask: 10.30 last: 10.30
+  PUT BMO 2017-10-20 110.00 bid: 13.90 ask: 14.70 last: 14.70
+  PUT BMO 2017-10-20 115.00 bid: 18.65 ask: 19.40 last: 19.40
+  PUT BMO 2017-10-20 120.00 bid: 23.60 ask: 24.30 last: 24.30
+  PUT BMO 2017-10-20 125.00 bid: 28.60 ask: 29.50 last: 29.50
+  PUT BMO 2018-01-19 38.00 bid: 0.01 ask: 0.43 last: 0.43
+  PUT BMO 2018-01-19 40.00 bid: 0.01 ask: 1.17 last: 1.17
+  PUT BMO 2018-01-19 42.00 bid: 0.01 ask: 1.14 last: 1.14
+  PUT BMO 2018-01-19 44.00 bid: 0.01 ask: 1.19 last: 1.19
+  PUT BMO 2018-01-19 46.00 bid: 0.01 ask: 1.21 last: 1.21
+  PUT BMO 2018-01-19 48.00 bid: 0.01 ask: 0.20 last: 0.20
+  PUT BMO 2018-01-19 50.00 bid: 0.01 ask: 0.35 last: 0.35
+  PUT BMO 2018-01-19 52.00 bid: 0.02 ask: 1.25 last: 1.25
+  PUT BMO 2018-01-19 54.00 bid: 0.10 ask: 0.14 last: 0.14
+  PUT BMO 2018-01-19 56.00 bid: 0.10 ask: 1.15 last: 1.15
+  PUT BMO 2018-01-19 58.00 bid: 0.02 ask: 1.29 last: 1.29
+  PUT BMO 2018-01-19 60.00 bid: 0.02 ask: 1.31 last: 1.31
+  PUT BMO 2018-01-19 62.00 bid: 0.11 ask: 1.34 last: 1.34
+  PUT BMO 2018-01-19 64.00 bid: 0.02 ask: 1.37 last: 1.37
+  PUT BMO 2018-01-19 66.00 bid: 0.02 ask: 0.39 last: 0.39
+  PUT BMO 2018-01-19 68.00 bid: 0.07 ask: 0.44 last: 0.44
+  PUT BMO 2018-01-19 70.00 bid: 0.13 ask: 0.50 last: 0.50
+  PUT BMO 2018-01-19 72.00 bid: 0.21 ask: 1.55 last: 1.55
+  PUT BMO 2018-01-19 74.00 bid: 0.31 ask: 1.66 last: 1.66
+  PUT BMO 2018-01-19 76.00 bid: 0.43 ask: 1.77 last: 1.77
+  PUT BMO 2018-01-19 78.00 bid: 0.60 ask: 0.95 last: 0.95
+  PUT BMO 2018-01-19 80.00 bid: 0.77 ask: 1.69 last: 1.69
+  PUT BMO 2018-01-19 82.00 bid: 1.01 ask: 1.95 last: 1.95
+  PUT BMO 2018-01-19 84.00 bid: 1.30 ask: 2.28 last: 2.28
+  PUT BMO 2018-01-19 86.00 bid: 1.65 ask: 2.65 last: 2.65
+  PUT BMO 2018-01-19 88.00 bid: 2.07 ask: 3.15 last: 3.15
+  PUT BMO 2018-01-19 90.00 bid: 2.52 ask: 3.60 last: 3.60
+  PUT BMO 2018-01-19 92.00 bid: 3.15 ask: 4.30 last: 4.30
+  PUT BMO 2018-01-19 94.00 bid: 3.80 ask: 5.15 last: 5.15
+  PUT BMO 2018-01-19 96.00 bid: 4.60 ask: 6.00 last: 6.00
+  PUT BMO 2018-01-19 98.00 bid: 5.65 ask: 6.75 last: 6.75
+  PUT BMO 2018-01-19 100.00 bid: 6.75 ask: 7.95 last: 7.95
+  PUT BMO 2018-01-19 105.00 bid: 10.15 ask: 11.30 last: 11.30
+  PUT BMO 2018-01-19 110.00 bid: 14.40 ask: 15.70 last: 15.70
+  PUT BMO 2018-01-19 115.00 bid: 19.15 ask: 20.40 last: 20.40
+  PUT BMO 2018-01-19 120.00 bid: 24.05 ask: 25.30 last: 25.30
+  PUT BMO 2018-01-19 125.00 bid: 29.00 ask: 29.80 last: 29.80
+  PUT BMO 2018-01-19 130.00 bid: 33.95 ask: 35.05 last: 35.05
+  PUT BMO 2019-01-18 40.00 bid: 0.00 ask: 2.26 last: 2.26
+  PUT BMO 2019-01-18 42.00 bid: 0.00 ask: 2.29 last: 2.29
+  PUT BMO 2019-01-18 44.00 bid: 0.00 ask: 2.32 last: 2.32
+  PUT BMO 2019-01-18 46.00 bid: 0.00 ask: 1.00 last: 1.00
+  PUT BMO 2019-01-18 48.00 bid: 0.00 ask: 1.00 last: 1.00
+  PUT BMO 2019-01-18 50.00 bid: 0.00 ask: 1.00 last: 1.00
+  PUT BMO 2019-01-18 52.00 bid: 0.00 ask: 1.00 last: 1.00
+  PUT BMO 2019-01-18 54.00 bid: 0.00 ask: 1.00 last: 1.00
+  PUT BMO 2019-01-18 56.00 bid: 0.00 ask: 1.00 last: 1.00
+  PUT BMO 2019-01-18 58.00 bid: 0.00 ask: 1.21 last: 1.21
+  PUT BMO 2019-01-18 60.00 bid: 0.50 ask: 3.00 last: 3.00
+  PUT BMO 2019-01-18 62.00 bid: 0.07 ask: 3.05 last: 3.05
+  PUT BMO 2019-01-18 64.00 bid: 0.16 ask: 1.84 last: 1.84
+  PUT BMO 2019-01-18 66.00 bid: 0.29 ask: 2.90 last: 2.90
+  PUT BMO 2019-01-18 68.00 bid: 0.45 ask: 3.55 last: 3.55
+  PUT BMO 2019-01-18 70.00 bid: 0.62 ask: 2.50 last: 2.50
+  PUT BMO 2019-01-18 72.00 bid: 0.83 ask: 2.86 last: 2.86
+  PUT BMO 2019-01-18 74.00 bid: 1.75 ask: 3.20 last: 3.20
+  PUT BMO 2019-01-18 76.00 bid: 1.36 ask: 3.60 last: 3.60
+  PUT BMO 2019-01-18 78.00 bid: 1.71 ask: 4.05 last: 4.05
+  PUT BMO 2019-01-18 80.00 bid: 2.07 ask: 4.50 last: 4.50
+  PUT BMO 2019-01-18 82.00 bid: 2.50 ask: 4.70 last: 4.70
+  PUT BMO 2019-01-18 84.00 bid: 3.10 ask: 4.40 last: 4.40
+  PUT BMO 2019-01-18 86.00 bid: 3.55 ask: 6.20 last: 6.20
+  PUT BMO 2019-01-18 88.00 bid: 4.20 ask: 6.90 last: 6.90
+  PUT BMO 2019-01-18 90.00 bid: 5.15 ask: 7.85 last: 7.85
+  PUT BMO 2019-01-18 92.00 bid: 5.95 ask: 8.45 last: 8.45
+  PUT BMO 2019-01-18 94.00 bid: 6.80 ask: 9.35 last: 9.35
+  PUT BMO 2019-01-18 96.00 bid: 7.70 ask: 10.70 last: 10.70
+  PUT BMO 2019-01-18 98.00 bid: 8.75 ask: 11.85 last: 11.85
+  PUT BMO 2019-01-18 100.00 bid: 9.85 ask: 12.80 last: 12.80
+  PUT BMO 2019-01-18 105.00 bid: 12.95 ask: 16.45 last: 16.45
+  PUT BMO 2019-01-18 110.00 bid: 16.70 ask: 19.85 last: 19.85
+  PUT BMO 2019-01-18 115.00 bid: 20.95 ask: 23.95 last: 23.95
+  PUT BMO 2019-01-18 120.00 bid: 25.70 ask: 28.25 last: 28.25
+  PUT BMO 2019-01-18 125.00 bid: 30.55 ask: 32.90 last: 32.90
+  PUT BMO 2019-01-18 130.00 bid: 35.45 ask: 37.40 last: 37.40
+----
