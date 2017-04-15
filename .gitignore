@@ -1,2 +1,6 @@
 **/nbactions.xml
 **/nbproject/
+/quote-api/target/
+/quote-service/target/
+/quote-yahoo/target/
+/option-scraper-tmx/target/
